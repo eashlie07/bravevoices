@@ -51,6 +51,7 @@ h1, h2, h3, p {
 h1, h2, h3, blockquote {
     font-family: "Fraunces", serif;
     font-weight: 500;
+    line-height: 1.85;
 }
 
 h1, h2, h3 {

@@ -567,23 +567,23 @@ a {
     .site-nav {
         display: none; /* Can be expanded to mobile toggle */
     }
-    
+
     .two-col,
     .three-col-cards,
     .footer-grid {
         grid-template-columns: 1fr;
         gap: 2.5rem;
     }
-    
+
     .program-item {
         grid-template-columns: 40px 1fr;
     }
-    
+
     .prog-link {
         grid-column: 2;
         justify-self: start;
     }
-    
+
     .footer-bottom {
         flex-direction: column;
         gap: 0.5rem;

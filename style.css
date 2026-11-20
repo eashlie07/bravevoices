@@ -491,6 +491,28 @@ img { max-width: 100%; height: auto; display: block; }
 
 .contact-card .btn-full { margin-top: 0.25rem; }
 
+/* spam trap — invisible to people, visible to bots */
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+.contact-card .btn[disabled] { opacity: 0.6; cursor: progress; transform: none; }
+
+.form-status { font-size: 0.85rem; line-height: 1.5; margin-top: 0.9rem; min-height: 0; }
+.form-status:empty { display: none; }
+.form-status.is-ok {
+  color: #1f5c33;
+  background: #e4efe2;
+  border-left: 3px solid #2e7d43;
+  padding: 0.7rem 0.85rem;
+}
+.form-status.is-error {
+  color: #8a1c14;
+  background: #f7e5e1;
+  border-left: 3px solid #a32a1d;
+  padding: 0.7rem 0.85rem;
+}
+.form-status a { color: inherit; font-weight: 700; }
+
+
 .form-note {
   font-size: 0.78rem;
   color: var(--muted);

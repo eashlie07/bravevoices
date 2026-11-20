@@ -456,11 +456,12 @@
 
   <!-- ============================================================
        CONTACT
-       The form opens the visitor's own email app with the message
-       already written, addressed to you. Nothing is stored on the
-       site and no server is needed.
-       ✏️ EDIT: your email address appears in two places in this
-       section — in the form code and in the text underneath.
+       The form sends for real: it posts to /api/contact, which is a
+       tiny Cloudflare function (in the functions folder) that emails
+       you through Resend. The visitor stays on the page.
+       ✏️ EDIT: your email address appears three places — the visible
+       contact details, the confirmation line, and TO_ADDRESS in
+       Cloudflare. Change all three if it ever changes.
   ============================================================= -->
   <section class="section contact-section" id="contact">
     <div class="container">
@@ -506,11 +507,21 @@
             <label for="message">Message</label>
             <textarea id="message" name="message" rows="5" required></textarea>
 
-            <button type="submit" class="btn btn-cream btn-full">Send message <span aria-hidden="true">→</span></button>
+            <!-- Spam trap. People never see this; bots fill it in. -->
+            <div class="hp" aria-hidden="true">
+              <label for="website">Leave this empty</label>
+              <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+            </div>
+
+            <button type="submit" class="btn btn-cream btn-full" id="contact-submit">
+              Send message <span aria-hidden="true">→</span>
+            </button>
+
+            <p class="form-status" id="contact-status" role="status" aria-live="polite"></p>
 
             <p class="form-note">
-              This opens your own email app with the message ready to send. If nothing happens,
-              email <a href="mailto:eashlie07@gmail.com">eashlie07@gmail.com</a> directly.
+              Goes straight to my inbox. I usually reply within a day or two.
+              Prefer email? <a href="mailto:eashlie07@gmail.com">eashlie07@gmail.com</a>
             </p>
           </form>
         </div>
@@ -549,32 +560,61 @@
 </footer>
 
 <script>
-/* Contact form: builds an email from what the visitor typed and hands it
-   to their own email app. Nothing is sent through the website itself. */
-document.getElementById('contact-form').addEventListener('submit', function (e) {
-  e.preventDefault();
+/* Contact form. Posts to /api/contact, which emails you.
+   If that ever fails, the visitor gets the direct address instead
+   of a dead button. */
+(function () {
+  var form   = document.getElementById('contact-form');
+  var status = document.getElementById('contact-status');
+  var button = document.getElementById('contact-submit');
 
-  var name    = document.getElementById('name').value.trim();
-  var email   = document.getElementById('email').value.trim();
-  var kid     = document.getElementById('kid').value.trim();
-  var message = document.getElementById('message').value.trim();
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
 
-  if (!name || !email || !message) {
-    alert('Please fill in your name, your email, and a message.');
-    return;
-  }
+    var name    = document.getElementById('name').value.trim();
+    var email   = document.getElementById('email').value.trim();
+    var kid     = document.getElementById('kid').value.trim();
+    var message = document.getElementById('message').value.trim();
+    var trap    = document.getElementById('website').value.trim();
 
-  var subject = 'Brave Voices Academy question from ' + name;
-  var body =
-    'Name: ' + name + '\n' +
-    'Email: ' + email + '\n' +
-    (kid ? 'Child\'s age: ' + kid + '\n' : '') +
-    '\n' + message;
+    var valid = /.+@.+\..+/.test(email);
+    if (!name || !valid || !message) {
+      status.className = 'form-status is-error';
+      status.textContent = 'Please add your name, a valid email, and a message.';
+      return;
+    }
 
-  window.location.href = 'mailto:eashlie07@gmail.com'
-    + '?subject=' + encodeURIComponent(subject)
-    + '&body=' + encodeURIComponent(body);
-});
+    button.disabled = true;
+    button.textContent = 'Sending…';
+    status.className = 'form-status';
+    status.textContent = '';
+
+    fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ name: name, email: email, kid: kid, message: message, website: trap })
+    })
+      .then(function (res) { return res.json().then(function (d) { return { ok: res.ok, d: d }; }); })
+      .then(function (r) {
+        if (r.ok && r.d.ok) {
+          form.reset();
+          status.className = 'form-status is-ok';
+          status.textContent = 'Thank you — your message is on its way. I\u2019ll reply to ' + email + '.';
+        } else {
+          throw new Error((r.d && r.d.error) || 'failed');
+        }
+      })
+      .catch(function () {
+        status.className = 'form-status is-error';
+        status.innerHTML = 'That didn\u2019t go through. Please email ' +
+          '<a href="mailto:eashlie07@gmail.com">eashlie07@gmail.com</a> directly.';
+      })
+      .finally(function () {
+        button.disabled = false;
+        button.textContent = 'Send message \u2192';
+      });
+  });
+})();
 </script>
 
 </body>

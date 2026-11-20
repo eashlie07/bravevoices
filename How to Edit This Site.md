@@ -81,28 +81,84 @@ class — which is the thing you've been missing.
 
 ## The contact form
 
-It works like this: the visitor fills in the boxes, presses Send, and **their own email app
-opens** with the message written out and addressed to `eashlie07@gmail.com`. They press send.
+It sends for real. The visitor types, presses Send, and it lands in your inbox — they never
+leave the page and they don't need an email app.
 
-Nothing passes through the website. No server, no account, no monthly fee.
+It works in two pieces:
 
-The catch, and it's a real one: **it only works if they have an email app set up on their
-device.** On a phone with the Gmail app, fine. On a shared library computer, probably not.
-That's why the form says so underneath, and why the direct address is printed beside it.
+1. **`index.html`** — the boxes on the page.
+2. **`functions/api/contact.js`** — a small file Cloudflare runs on its own servers. It turns
+   the message into an email and sends it. You never edit this file.
 
-If you'd rather have a proper form that arrives in your inbox from anywhere, use
-**Formspree** (free tier, 50 messages a month) or **Netlify Forms**. It's one line changed
-in the `<form>` tag plus a confirmation email. Ask me and I'll do it.
+For that to work you need a free **Resend** account, because Cloudflare can't send email by
+itself. It takes about ten minutes, once.
 
-To change the address the form writes to, search for `eashlie07@gmail.com` — it appears in
-the form's script and in the contact details above it. Change both.
+### Setting it up
 
----
+1. Go to **resend.com** and sign up using **eashlie07@gmail.com** — the same address the
+   messages go to. (Free tier: 3,000 emails a month, 100 a day. You will not come close.)
+2. In Resend, click **API Keys → Create API Key**. Name it "Brave Voices", permission
+   "Sending access". Copy the key — it starts with `re_` and you only see it once.
+3. Go to your Cloudflare dashboard → **Workers & Pages** → your Brave Voices project →
+   **Settings** → **Environment variables** (or "Variables and Secrets").
+4. Add these three. Set each as a **Secret** where the option is offered:
+
+   | Name | Value |
+   |---|---|
+   | `RESEND_API_KEY` | the `re_...` key from step 2 |
+   | `TO_ADDRESS` | `eashlie07@gmail.com` |
+   | `FROM_ADDRESS` | `Brave Voices Academy <onboarding@resend.dev>` |
+
+5. Save, then redeploy (upload the files again, or **Retry deployment**).
+6. Send yourself a test message from the live site.
+
+### Why `onboarding@resend.dev` and not your own address
+
+Resend only lets you send *from* an address on a domain you've verified. You don't own a
+domain yet, so the sending address is theirs — but the **reply-to** is the parent's, so when
+you hit Reply you're answering the parent directly. Nobody sees the onboarding address
+unless they dig into the message headers.
+
+**The day you buy `bravevoices.com`:** verify it in Resend (adds a few DNS records, Resend
+walks you through it), then change `FROM_ADDRESS` to
+`Brave Voices Academy <hello@bravevoices.com>`. That also fixes the deliverability risk
+below.
+
+### The one real risk
+
+Until you have your own domain, some of your mail may land in **spam** — Gmail treats
+`onboarding@resend.dev` as an unknown sender. Check your spam folder for the first few
+messages. It's another good reason to buy the domain.
+
+### If it ever stops working
+
+The form falls back on its own: the visitor sees a message telling them to email you
+directly, with a clickable link. Nobody gets a dead button.
+
+### Prefer a company that does this for you?
+
+**Formspree** (formspree.io) needs no function file and no Cloudflare setup — free tier, 50
+messages a month. Create a form, copy the endpoint they give you, and change one line in
+`index.html`:
+
+```html
+<form id="contact-form" action="https://formspree.io/f/YOURCODE" method="POST">
+```
+
+Then delete the `functions` folder and the `<script>` at the bottom. Less control, less setup.
+Fifty messages a month is a real ceiling once a class fills, so I'd start with Resend.
+
+### Changing your email address
+
+It appears in three places: the visible contact details near the top of the section, the
+confirmation line under the button, and `TO_ADDRESS` in Cloudflare. Change all three.
 
 ## Publishing
 
-You're on Cloudflare Pages. Replace `index.html` and `style.css` in your project, and the
-site updates itself in about a minute. Then **look at it on your phone** before you tell
+You're on Cloudflare Pages. Upload **everything in this folder** — `index.html`,
+`style.css`, the `imgs` folder, and the `functions` folder (that's the contact form's engine).
+Keep the folder structure exactly as it is; `functions/api/contact.js` has to stay at that
+path or the form won't find it. The site updates itself in about a minute. Then **look at it on your phone** before you tell
 anyone about it.
 
 ---

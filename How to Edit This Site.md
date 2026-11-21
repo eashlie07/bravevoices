@@ -65,6 +65,24 @@ swap in theirs. A direct link to the class beats the catalogue every time.
 Each one starts with a number (`01`, `02`) — renumber them if you add or remove one, so the
 count stays honest.
 
+**5. The online classes section** (the pale band, just below Programs). Three cards and a
+button, all pointing at your Wimzee profile.
+
+| What | Where |
+|---|---|
+| Wimzee profile address | the two places marked `WIMZEE LINK` |
+| Age badge on a card | `<span class="step-num">AGES 12–18</span>` |
+| Class title | the `<h3>` under it |
+| Class description | the `<p>` under that |
+
+To add a fourth class, copy one whole `<article>` block and paste it after the last one.
+To hide the section during a season when you're not teaching online, put `<!--` above
+`<section` and `-->` after `</section>` — the instructions are in the code too.
+
+**One thing to keep straight:** online classes are booked and paid through Wimzee, not
+through Parks & Rec. That's why they have their own section with their own links instead of
+sitting inside the class card.
+
 ---
 
 ## When there's no class scheduled

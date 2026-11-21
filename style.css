@@ -382,6 +382,25 @@ img { max-width: 100%; height: auto; display: block; }
 .prog-link span { color: #e3a173; margin-left: 0.4rem; }
 .prog-link:hover { border-color: #e3a173; }
 
+/* ---------- ONLINE CLASSES ---------- */
+.online-card-link {
+  display: inline-block;
+  margin-top: 1.1rem;
+  text-decoration: none;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+}
+.online-card-link span { margin-left: 0.4rem; }
+.online-card-link:hover { border-color: var(--accent); }
+
+.online-cta { margin-top: 4rem; text-align: center; }
+.online-cta .micro-text { max-width: 46ch; margin-inline: auto; }
+
 /* ---------- QUOTE ---------- */
 .quote-box {
   margin-top: 4.5rem;
